@@ -1,0 +1,43 @@
+{
+  "name": "inventory-application",
+  "version": "1.0.0",
+  "description": "Inventory management express app for an imaginary store",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "start-debug": "DEBUG=inventory-application* npm start",
+    "devstart": "nodemon app.js",
+    "serverstart": "DEBUG=inventory-application:* npm run devstart"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/igorashs/inventory-application.git"
+  },
+  "keywords": [
+    "express",
+    "nodejs"
+  ],
+  "author": "igorashs",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/igorashs/inventory-application/issues"
+  },
+  "engines": {
+    "node": "13.12.0"
+  },
+  "homepage": "https://github.com/igorashs/inventory-application#readme",
+  "dependencies": {
+    "@hapi/joi": "^17.1.1",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "http-errors": "^1.7.3",
+    "mongoose": "^5.9.7",
+    "morgan": "^1.10.0",
+    "multer": "^1.4.2",
+    "pug": "^2.0.4"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.2"
+  }
+}
