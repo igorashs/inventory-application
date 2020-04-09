@@ -6,12 +6,19 @@ const env = require('./.env.config');
 
 const app = express();
 
+const indexRouter = require('./routes/index');
+const catalogRouter = require('./routes/catalog');
+
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
 
 // serve static files
 app.use(express.static(path.join(__dirname, 'public')));
+
+// add our routers
+app.use('/', indexRouter);
+app.use('/catalog', catalogRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
