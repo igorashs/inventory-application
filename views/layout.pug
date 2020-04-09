@@ -3,7 +3,17 @@ html(lang="en")
   head
     meta(charset="UTF-8")
     meta(name="viewport", content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet", href="assets/styles/style.css")
     title= title || 'Error'
   body
+    .wrapper
+      nav
+        ul
+          li
+            a(href="/catalog") Inventory
+          block navigation_links
+      main
+        block content
+      footer
+        p Made By igorash
 
-    block content
