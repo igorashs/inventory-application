@@ -1,5 +1,8 @@
 const router = require('express').Router();
 const categoryController = require('../controllers/categoryController');
+const itemController = require('../controllers/itemController');
+
+// category
 
 // GET catalog home page
 router.get('/', categoryController.getIndex);
@@ -27,5 +30,28 @@ router.get('/category/:id', categoryController.getCategoryItems);
 
 // GET req for all categories
 router.get('/categories', categoryController.getCategoryList);
+
+// item
+
+// GET req for creating an item
+router.get('/item/create', itemController.getItemCreate);
+
+// POST req for creating an item
+router.post('/item/create', itemController.postItemCreate);
+
+// GET req to delete an item
+router.get('/item/:id/delete', itemController.getItemDelete);
+
+// POST req to delete an item
+router.post('/item/:id/delete', itemController.postItemDelete);
+
+// GET req to update an item
+router.get('/item/:id/update', itemController.getItemUpdate);
+
+// POST req to update an item
+router.post('/item/:id/update', itemController.postItemUpdate);
+
+// GET req for detail page of an item
+router.get('/item/:id', itemController.getItemDetail);
 
 module.exports = router;
