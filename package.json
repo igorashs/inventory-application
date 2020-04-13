@@ -7,7 +7,7 @@
     "start": "node app.js",
     "start-debug": "DEBUG=inventory-application* npm start",
     "devstart": "nodemon app.js",
-    "serverstart": "DEBUG=inventory-application:* npm run devstart"
+    "serverstart": "DEBUG=inventory-application:*,controller npm run devstart"
   },
   "repository": {
     "type": "git",
