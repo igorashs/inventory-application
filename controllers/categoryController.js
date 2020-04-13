@@ -1,6 +1,24 @@
+const Category = require('../models/category');
+const Item = require('../models/item');
+const debug = require('debug')('controller');
+
 // home page (shows total data) on GET
-exports.getIndex = (req, res) => {
-  res.send('/ not Implemented');
+exports.getIndex = async (req, res, next) => {
+  try {
+    const results = {
+      categoryCount: Category.countDocuments({}),
+      itemCount: Item.countDocuments({})
+    };
+
+    res.render('index', {
+      title: 'Inventory Application',
+      categoryCount: await results.categoryCount,
+      itemCount: await results.itemCount
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // list all categories on GET
