@@ -45,7 +45,7 @@ async function createItem(name, description, category, price, stock) {
   }
 }
 
-async function createCategories(cb) {
+async function createCategories() {
   try {
     await Promise.all([
       createCategory(
@@ -62,7 +62,7 @@ async function createCategories(cb) {
   }
 }
 
-async function createItems(cb) {
+async function createItems() {
   try {
     await Promise.all([
       createItem(
@@ -100,20 +100,9 @@ async function createItems(cb) {
 }
 
 async function populateDB() {
-  const cb = (err, data) => {
-    if (err) {
-      console.error('Error', err);
-      return;
-    }
-
-    if (data) {
-      console.log('Data', data);
-    }
-  };
-
   try {
-    await createCategories(cb);
-    await createItems(cb);
+    await createCategories();
+    await createItems();
 
     mongoose.connection.close();
 
