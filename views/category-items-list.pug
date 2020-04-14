@@ -1,0 +1,23 @@
+extend layout
+
+block navigation_links
+    li
+      a(href="/catalog/categories") Categories
+    li
+      a(href="/catalog/item/create") Add Item
+
+block content
+  header
+    h1= category.name
+    div(class="options")
+      a(class="btn btn-update" href='/catalog/category/' + category._id + '/update') Update
+      a(class="btn btn-delete" href='/catalog/category/' + category._id + '/delete') Delete
+    p= category.description
+
+
+  ul(class="list list-items")
+    each item in items
+      li
+        a(href=item.url)
+          img(class="img" src=item.imgURL, alt="item image")
+          span(class="title") #{item.name}
