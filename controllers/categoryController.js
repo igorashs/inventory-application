@@ -22,8 +22,15 @@ exports.getIndex = async (req, res, next) => {
 };
 
 // list all categories on GET
-exports.getCategoryList = (req, res) => {
-  res.send('/categories not Implemented');
+exports.getCategoryList = async (req, res, next) => {
+  try {
+    const categories = await Category.find({});
+
+    res.render('category-list', { title: 'Categories', categories });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // display all items for a specific category GET
