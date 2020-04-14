@@ -36,6 +36,7 @@ body {
   text-rendering: optimizeSpeed;
   line-height: 1.5;
   font-family: Roboto, Arial, Helvetica, sans-serif;
+  color: #fff;
 }
 
 /* Remove list styles on ul and ol elements */
@@ -74,3 +75,57 @@ select {
 }
 
 /* own style here */
+a {
+  text-decoration: none;
+  color: #fff;
+}
+
+.wrapper {
+  display: flex;
+  height: 100vh;
+  flex-direction: column;
+}
+
+/* nav */
+nav {
+  background: #172a3a;
+}
+
+nav ul {
+  display: flex;
+  font-size: 24px;
+}
+
+nav li {
+  padding: 10px;
+  background: #74b3ce1c;
+  cursor: pointer;
+}
+
+nav li:hover {
+  background: #74b3ce44;
+}
+
+nav li:nth-child(2n) {
+  margin-left: 10px;
+}
+
+/* main */
+main {
+  flex: 1;
+  background: #004346;
+}
+
+main,
+.inventory-details {
+  padding: 10px;
+  border-top: 1px solid #508991;
+  border-bottom: 1px solid #508991;
+}
+
+/* footer */
+
+footer {
+  background: #172a3a;
+  text-align: center;
+}
