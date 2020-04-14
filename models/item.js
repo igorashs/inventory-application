@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 const { Schema } = mongoose;
 
@@ -15,7 +16,13 @@ ItemSchema.virtual('url').get(function () {
 });
 
 ItemSchema.virtual('imgURL').get(function () {
-  return `/assets/images/${this._id}`;
+  const path = `/assets/images/${this._id}`;
+
+  if (fs.existsSync(path)) {
+    return path;
+  }
+
+  return '/assets/images/item-default.png';
 });
 
 module.exports = mongoose.model('Item', ItemSchema);
