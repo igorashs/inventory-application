@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const fs = require('fs');
 
 const { Schema } = mongoose;
 
@@ -12,7 +13,13 @@ CategorySchema.virtual('url').get(function () {
 });
 
 CategorySchema.virtual('imgURL').get(function () {
-  return `/assets/images/${this._id}`;
+  const path = `/assets/images/${this._id}`;
+
+  if (fs.existsSync(path)) {
+    return path;
+  }
+
+  return '/assets/images/category-default.png';
 });
 
 module.exports = mongoose.model('Category', CategorySchema);
