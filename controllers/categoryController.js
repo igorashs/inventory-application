@@ -34,8 +34,24 @@ exports.getCategoryList = async (req, res, next) => {
 };
 
 // display all items for a specific category GET
-exports.getCategoryItems = (req, res) => {
-  res.send('/category/:id not Implemented');
+exports.getCategoryItems = async (req, res, next) => {
+  try {
+    const results = {
+      category: Category.findById(req.params.id),
+      items: Item.find({ category: req.params.id })
+    };
+
+    results.category = await results.category;
+    results.items = await results.items;
+
+    res.render('category-items-list', {
+      title: `${results.category.name} Category Items`,
+      ...results
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // display category create form on GET
