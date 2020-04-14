@@ -1,0 +1,14 @@
+extend layout
+
+block navigation_links
+  li
+    a(href="/catalog/category/create") Add Category
+
+block content
+  ul(class="list category-list")
+    each category in categories
+      li
+        a(href=category.url)
+          img(class="img" src=category.imgURL, alt="category image")
+          span(class="title") #{category.name}
+
