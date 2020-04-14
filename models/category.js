@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const path = require('path');
 const fs = require('fs');
 
 const { Schema } = mongoose;
@@ -13,13 +14,16 @@ CategorySchema.virtual('url').get(function () {
 });
 
 CategorySchema.virtual('imgURL').get(function () {
-  const path = `/assets/images/${this._id}`;
+  const pathJPG = `/assets/images/${this._id}.jpg`;
+  const pathPNG = `/assets/images/${this._id}.png`;
 
-  if (fs.existsSync(path)) {
-    return path;
+  if (fs.existsSync(path.join('public', pathJPG))) {
+    return pathJPG;
+  } else if (fs.existsSync(path.join('public', pathPNG))) {
+    return pathPNG;
   }
 
-  return '/assets/images/category-default.png';
+  return '/assets/images/default.png';
 });
 
 module.exports = mongoose.model('Category', CategorySchema);
