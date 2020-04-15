@@ -1,0 +1,21 @@
+extend layout
+
+block navigation_links
+    li
+      a(href="/catalog/categories") Categories
+
+block content
+  header
+    h1= title
+  
+  form(class="form" action="/catalog/category/create", method="post")
+    div(class="input-group")
+      label(for="name") Name
+      input(id="name" name="name" type="text" required placeholder="Ex: Phones...")
+    div(class="input-group")
+      label(for="description") Description
+      textarea(id="description" name="description" required placeholder="Add description here")
+    div(class="input-group")
+      label(for="img") Imagine (300x300 recommended)
+      input(id="img" type="file", name="img")
+    button(class="submit-btn" type="submit") Submit
