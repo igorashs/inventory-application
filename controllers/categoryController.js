@@ -1,6 +1,36 @@
 const Category = require('../models/category');
 const Item = require('../models/item');
 const debug = require('debug')('controller');
+const Joi = require('@hapi/joi');
+const util = require('util');
+const fs = require('fs');
+const path = require('path');
+const multer = require('multer');
+
+const writeFile = util.promisify(fs.writeFile);
+
+// MB
+const FILE_SIZE = 2;
+const MAX_FILE_SIZE = 1024 * 1024 * FILE_SIZE;
+
+const upload = multer({
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
+      cb(null, true);
+    } else {
+      const err = new Error('"image" make sure is a jpg or png file');
+      err.code = 'MISMATCH_MIME_TYPE';
+      cb(err);
+    }
+  }
+}).single('img');
+
+const categoryValidationSchema = Joi.object({
+  name: Joi.string().trim().min(1).max(100).required(),
+  description: Joi.string().trim().min(1).max(255).required(),
+  img: Joi.string().trim().allow('')
+});
 
 // home page (shows total data) on GET
 exports.getIndex = async (req, res, next) => {
@@ -60,8 +90,67 @@ exports.getCategoryCreate = (req, res) => {
 };
 
 // handle category create on POST
-exports.postCategoryCreate = (req, res) => {
-  res.send('/category/create POST not Implemented');
+exports.postCategoryCreate = async (req, res, next) => {
+  upload(req, res, async (err) => {
+    let errors = [];
+
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        errors.push({
+          message: `"image" the file size should be less than ${FILE_SIZE} MB`
+        });
+      }
+
+      if (err.code === 'MISMATCH_MIME_TYPE') {
+        errors.push({ message: err.message });
+      }
+    }
+
+    const { error, value } = categoryValidationSchema.validate(req.body, {
+      abortEarly: false
+    });
+
+    if (error) {
+      errors = errors.concat(error.details);
+    }
+
+    if (errors.length) {
+      debug(errors);
+      res.render('category-create', {
+        title: 'Create Category',
+        errors,
+        item: req.body
+      });
+    } else {
+      const category = new Category(req.body);
+
+      try {
+        const results = {};
+
+        // save the category to db
+        results.categorySave = category.save();
+
+        if (req.file) {
+          const filename = `${category._id}${path.extname(
+            req.file.originalname
+          )}`;
+
+          // save the file if id name of document
+          results.fileSave = writeFile(
+            path.join(__dirname, '../public/assets/images/', filename),
+            req.file.buffer
+          );
+          await results.fileSave;
+        }
+        await results.categorySave;
+
+        res.redirect('/catalog/categories');
+      } catch (err) {
+        debug(err);
+        next();
+      }
+    }
+  });
 };
 
 // display category update form on GET
