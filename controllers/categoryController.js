@@ -56,7 +56,7 @@ exports.getCategoryItems = async (req, res, next) => {
 
 // display category create form on GET
 exports.getCategoryCreate = (req, res) => {
-  res.send('/category/create GET not Implemented');
+  res.render('category-create', { title: 'Create Category' });
 };
 
 // handle category create on POST
