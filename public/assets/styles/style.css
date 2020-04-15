@@ -205,6 +205,39 @@ main,
   font-size: 20px;
 }
 
+.item-details {
+  padding-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  border-top: 1px solid white;
+}
+
+.item-img {
+  justify-self: center;
+  align-self: center;
+  max-width: 100%;
+  min-width: 300px;
+  /* min-height: 300px; */
+  object-fit: contain;
+}
+
+.item-description {
+  margin-top: 20px;
+  padding-left: 20px;
+  padding-right: 30%;
+}
+
+.item-information {
+  margin-top: 16px;
+  margin-left: 20px;
+  font-size: 20px;
+  border-bottom: 1px solid white;
+}
+
+.item-information *:first-child {
+  padding-right: 10px;
+}
+
 /* footer */
 
 footer {
