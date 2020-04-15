@@ -1,0 +1,19 @@
+extend layout
+
+block navigation_links
+    li
+      a(href="/catalog/categories") Categories
+
+block content
+  header
+    h1= item.name
+    div(class="options")
+      a(class="btn btn-update" href='/catalog/item/' + item._id + '/update') Update
+      a(class="btn btn-delete" href='/catalog/item/' + item._id + '/delete') Delete
+  
+  div(class="item-details")
+    img(class="item-img" src=item.imgURL, alt="Item img")
+    p(class="item-description")= item.description
+    div(class="item-information")
+      span(class="stock") Stock: #{item.stock}
+      span(class="price") Price: #{item.price}$
