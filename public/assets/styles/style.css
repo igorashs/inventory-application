@@ -309,6 +309,11 @@ input[type='file']::-webkit-file-upload-button {
   margin-top: 16px;
 }
 
+.error-list {
+  color: #fa7f7f;
+  font-weight: 700;
+}
+
 /* footer */
 
 footer {
