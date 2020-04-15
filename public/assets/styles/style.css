@@ -104,6 +104,41 @@ a {
   color: #fa7f7f;
 }
 
+input,
+textarea,
+button,
+input[type='file']::-webkit-file-upload-button {
+  background: #acacac66;
+  border-radius: 4px;
+  border: 1px solid #ffdead;
+  padding: 8px;
+  box-shadow: 0 0 2px 1px #ccfffc;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: rgba(255, 255, 255, 0.657);
+}
+
+textarea {
+  height: 300px;
+  resize: none;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  -webkit-text-fill-color: white;
+  font-size: 20px;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 /* nav */
 nav {
   background: #172a3a;
@@ -236,6 +271,42 @@ main,
 
 .item-information *:first-child {
   padding-right: 10px;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+}
+
+.input-group label {
+  padding: 10px 0;
+  font-size: 20px;
+}
+
+.input-group > * {
+  font-weight: 700;
+  color: white;
+}
+
+.submit-btn,
+input[type='file']::-webkit-file-upload-button {
+  max-width: 300px;
+  font-size: 20px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.submit-btn {
+  margin-top: 16px;
 }
 
 /* footer */
