@@ -1,6 +1,16 @@
+const Item = require('../models/item');
+const debug = require('debug')('controller');
+
 // display details for a specific item on GET
-exports.getItemDetail = (req, res) => {
-  res.send('/item/:id GET Detail item not implemented');
+exports.getItemDetail = async (req, res, next) => {
+  try {
+    const item = await Item.findById(req.params.id);
+
+    res.render('item-detail', { title: `Item: ${item.name}`, item });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // display item create form on GET
