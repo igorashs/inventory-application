@@ -25,8 +25,6 @@ app.set('view engine', 'pug');
 // serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(express.urlencoded({ extended: true }));
-
 // add our routers
 app.use('/', indexRouter);
 app.use('/catalog', catalogRouter);
