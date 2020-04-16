@@ -86,7 +86,7 @@ exports.getCategoryItems = async (req, res, next) => {
 
 // display category create form on GET
 exports.getCategoryCreate = (req, res) => {
-  res.render('category-create', { title: 'Create Category' });
+  res.render('category-form', { title: 'Create Category' });
 };
 
 // handle category create on POST
@@ -116,7 +116,7 @@ exports.postCategoryCreate = async (req, res, next) => {
 
     if (errors.length) {
       debug(errors);
-      res.render('category-create', {
+      res.render('category-form', {
         title: 'Create Category',
         errors,
         category: req.body
