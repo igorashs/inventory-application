@@ -75,6 +75,11 @@ select {
 }
 
 /* own style here */
+:root {
+  --text-success: #9eff8d;
+  --text-danger: #ffa9a9;
+}
+
 a {
   text-decoration: none;
   color: #fff;
@@ -97,16 +102,17 @@ a {
 }
 
 .btn-update {
-  color: #9eff8d;
+  color: var(--text-success) !important;
 }
 
 .btn-delete {
-  color: #fa7f7f;
+  color: var(--text-danger) !important;
 }
 
 input,
 textarea,
 button,
+.reject-btn,
 input[type='file']::-webkit-file-upload-button {
   background: #acacac66;
   border-radius: 4px;
@@ -118,6 +124,12 @@ input[type='file']::-webkit-file-upload-button {
 input::placeholder,
 textarea::placeholder {
   color: rgba(255, 255, 255, 0.657);
+}
+
+.reject-btn {
+  display: inline-block;
+  text-align: center;
+  color: var(--text-success) !important;
 }
 
 textarea {
@@ -297,7 +309,8 @@ main,
 }
 
 .submit-btn,
-input[type='file']::-webkit-file-upload-button {
+input[type='file']::-webkit-file-upload-button,
+.reject-btn {
   max-width: 300px;
   font-size: 20px;
   color: white;
@@ -312,6 +325,17 @@ input[type='file']::-webkit-file-upload-button {
 .error-list {
   color: #fa7f7f;
   font-weight: 700;
+}
+
+.deletion-options {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.deletion-options > .submit-btn {
+  margin-top: 0;
 }
 
 /* footer */
