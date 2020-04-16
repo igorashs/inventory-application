@@ -42,6 +42,16 @@ function checkForFileErr(err) {
   }
 }
 
+function findFileAndRemoveWithExt(filename, exts) {
+  exts.forEach((ext) => {
+    const file = `${filename}${ext}`;
+
+    if (fs.existsSync(file)) {
+      return unlink(file);
+    }
+  });
+}
+
 function findAllValidationErrors(fileErr, body) {
   let errors = [];
 
@@ -250,11 +260,36 @@ exports.postCategoryUpdate = async (req, res, next) => {
 };
 
 // display category delete form on GET
-exports.getCategoryDelete = (req, res) => {
-  res.send('/category/:id/delete GET not Implemented');
+exports.getCategoryDelete = async (req, res, next) => {
+  try {
+    const results = {};
+
+    results.category = await Category.findById(req.params.id);
+    results.itemCount = await Item.countDocuments({ category: req.params.id });
+
+    res.render('category-delete', {
+      title: `Remove ${results.category.name} category`,
+      ...results
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // handle category delete on POST
-exports.postCategoryDelete = (req, res) => {
-  res.send('/category/:id/delete POST not Implemented');
+exports.postCategoryDelete = async (req, res, next) => {
+  try {
+    const category = await Category.findByIdAndDelete(req.params.id);
+    const items = await Item.deleteMany({ category: req.params.id });
+    const file = await findFileAndRemoveWithExt(
+      path.join(__dirname, '../public/assets/images/', req.params.id),
+      ['.png', '.jpg']
+    );
+
+    res.redirect('/catalog/categories');
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
