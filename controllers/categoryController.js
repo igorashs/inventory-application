@@ -119,7 +119,7 @@ exports.postCategoryCreate = async (req, res, next) => {
       res.render('category-create', {
         title: 'Create Category',
         errors,
-        item: req.body
+        category: req.body
       });
     } else {
       const category = new Category(req.body);
