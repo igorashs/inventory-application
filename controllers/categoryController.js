@@ -42,6 +42,26 @@ function checkForFileErr(err) {
   }
 }
 
+function findAllValidationErrors(fileErr, body) {
+  let errors = [];
+
+  const foundFileErr = checkForFileErr(fileErr);
+
+  if (foundFileErr) {
+    errors.push(foundFileErr);
+  }
+
+  const { error } = categoryValidationSchema.validate(body, {
+    abortEarly: false
+  });
+
+  if (error) {
+    errors = errors.concat(error.details);
+  }
+
+  return errors;
+}
+
 const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
@@ -121,21 +141,7 @@ exports.getCategoryCreate = (req, res) => {
 // handle category create on POST
 exports.postCategoryCreate = async (req, res, next) => {
   upload(req, res, async (err) => {
-    let errors = [];
-
-    const fileErr = checkForFileErr(err);
-
-    if (fileErr) {
-      errors.push(fileErr);
-    }
-
-    const { error, value } = categoryValidationSchema.validate(req.body, {
-      abortEarly: false
-    });
-
-    if (error) {
-      errors = errors.concat(error.details);
-    }
+    let errors = findAllValidationErrors(err, req.body);
 
     if (errors.length) {
       debug(errors);
@@ -196,21 +202,7 @@ exports.getCategoryUpdate = async (req, res, next) => {
 // handle category update on POST
 exports.postCategoryUpdate = async (req, res, next) => {
   upload(req, res, async (err) => {
-    let errors = [];
-
-    const fileErr = checkForFileErr(err);
-
-    if (fileErr) {
-      errors.push(fileErr);
-    }
-
-    const { error, value } = categoryValidationSchema.validate(req.body, {
-      abortEarly: false
-    });
-
-    if (error) {
-      errors = errors.concat(error.details);
-    }
+    let errors = findAllValidationErrors(err, req.body);
 
     if (errors.length) {
       debug(errors);
