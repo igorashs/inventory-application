@@ -9,7 +9,8 @@ const app = express();
 
 mongoose.connect(env.mongoDB, {
   useNewUrlParser: true,
-  useUnifiedTopology: true
+  useUnifiedTopology: true,
+  useFindAndModify: false
 });
 const db = mongoose.connection;
 
