@@ -28,6 +28,20 @@ function unlinkWithAnotherExt(dir, filename, ext, otherExts) {
   );
 }
 
+function checkForFileErr(err) {
+  if (err) {
+    if (err.code === 'LIMIT_FILE_SIZE') {
+      return {
+        message: `"image" the file size should be less than ${FILE_SIZE} MB`
+      };
+    }
+
+    if (err.code === 'MISMATCH_MIME_TYPE') {
+      return { message: err.message };
+    }
+  }
+}
+
 const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
   fileFilter: (req, file, cb) => {
@@ -109,16 +123,10 @@ exports.postCategoryCreate = async (req, res, next) => {
   upload(req, res, async (err) => {
     let errors = [];
 
-    if (err) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        errors.push({
-          message: `"image" the file size should be less than ${FILE_SIZE} MB`
-        });
-      }
+    const fileErr = checkForFileErr(err);
 
-      if (err.code === 'MISMATCH_MIME_TYPE') {
-        errors.push({ message: err.message });
-      }
+    if (fileErr) {
+      errors.push(fileErr);
     }
 
     const { error, value } = categoryValidationSchema.validate(req.body, {
@@ -190,16 +198,10 @@ exports.postCategoryUpdate = async (req, res, next) => {
   upload(req, res, async (err) => {
     let errors = [];
 
-    if (err) {
-      if (err.code === 'LIMIT_FILE_SIZE') {
-        errors.push({
-          message: `"image" the file size should be less than ${FILE_SIZE} MB`
-        });
-      }
+    const fileErr = checkForFileErr(err);
 
-      if (err.code === 'MISMATCH_MIME_TYPE') {
-        errors.push({ message: err.message });
-      }
+    if (fileErr) {
+      errors.push(fileErr);
     }
 
     const { error, value } = categoryValidationSchema.validate(req.body, {
