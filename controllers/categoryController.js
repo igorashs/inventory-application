@@ -8,10 +8,25 @@ const path = require('path');
 const multer = require('multer');
 
 const writeFile = util.promisify(fs.writeFile);
+const unlink = util.promisify(fs.unlink);
 
 // MB
 const FILE_SIZE = 2;
 const MAX_FILE_SIZE = 1024 * 1024 * FILE_SIZE;
+
+function unlinkWithAnotherExt(dir, filename, ext, otherExts) {
+  const others = otherExts.filter((other) => other !== ext);
+
+  return Promise.all(
+    others.map((other) => {
+      const otherFile = path.join(dir, `${filename}${other}`);
+
+      if (fs.existsSync(otherFile)) {
+        return unlink(otherFile);
+      }
+    })
+  );
+}
 
 const upload = multer({
   limits: { fileSize: MAX_FILE_SIZE },
@@ -140,8 +155,10 @@ exports.postCategoryCreate = async (req, res, next) => {
             path.join(__dirname, '../public/assets/images/', filename),
             req.file.buffer
           );
+
           await results.fileSave;
         }
+
         await results.categorySave;
 
         res.redirect('/catalog/categories');
@@ -169,8 +186,73 @@ exports.getCategoryUpdate = async (req, res, next) => {
 };
 
 // handle category update on POST
-exports.postCategoryUpdate = (req, res) => {
-  res.send('/category/:id/update POST not Implemented');
+exports.postCategoryUpdate = async (req, res, next) => {
+  upload(req, res, async (err) => {
+    let errors = [];
+
+    if (err) {
+      if (err.code === 'LIMIT_FILE_SIZE') {
+        errors.push({
+          message: `"image" the file size should be less than ${FILE_SIZE} MB`
+        });
+      }
+
+      if (err.code === 'MISMATCH_MIME_TYPE') {
+        errors.push({ message: err.message });
+      }
+    }
+
+    const { error, value } = categoryValidationSchema.validate(req.body, {
+      abortEarly: false
+    });
+
+    if (error) {
+      errors = errors.concat(error.details);
+    }
+
+    if (errors.length) {
+      debug(errors);
+      res.render('category-form', {
+        title: `Update ${req.body.name} category`,
+        errors,
+        category: req.body
+      });
+    } else {
+      try {
+        const results = {};
+
+        results.category = Category.findByIdAndUpdate(req.params.id, req.body);
+
+        if (req.file) {
+          const ext = path.extname(req.file.originalname);
+          const filename = `${req.params.id}${ext}`;
+
+          results.unlinkFile = unlinkWithAnotherExt(
+            path.join(__dirname, '../public/assets/images/'),
+            req.params.id,
+            ext,
+            ['.png', '.jpg']
+          );
+
+          // save the file if id name of document
+          results.fileSave = writeFile(
+            path.join(__dirname, '../public/assets/images/', filename),
+            req.file.buffer
+          );
+
+          await results.unlinkFile;
+          await results.fileSave;
+        }
+
+        await results.category;
+
+        res.redirect('/catalog/categories');
+      } catch (err) {
+        debug(err);
+        next();
+      }
+    }
+  });
 };
 
 // display category delete form on GET
