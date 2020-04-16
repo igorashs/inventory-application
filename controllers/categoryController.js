@@ -154,8 +154,18 @@ exports.postCategoryCreate = async (req, res, next) => {
 };
 
 // display category update form on GET
-exports.getCategoryUpdate = (req, res) => {
-  res.send('/category/:id/update GET not Implemented');
+exports.getCategoryUpdate = async (req, res, next) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    res.render('category-form', {
+      title: `Update ${category.name} category`,
+      category
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // handle category update on POST
