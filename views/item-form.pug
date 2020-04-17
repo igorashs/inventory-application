@@ -1,0 +1,36 @@
+extend layout
+
+block navigation_links
+    li
+      a(href="/catalog/category/" + category._id) Back
+
+block content
+  header
+    h1= title
+
+  if errors
+    ul(class="error-list")
+      each error in errors
+        li= error.message
+  
+  form(class="form" action="", method="post" enctype="multipart/form-data")
+    div(class="input-group")
+      label(for="name") Name
+      input(id="name" name="name" type="text" required placeholder="Ex: Minecraft diamond sword..." value=item ? item.name : '')
+    div(class="input-group")
+      label Category
+      input(type="text" disabled value=category ? category.name : '')
+    div(class="quantity")
+      div(class="input-group")
+        label(for="stock") Stock
+        input(id="stock" name="stock" type="number" required placeholder="Ex: 10" value=item ? item.stock : '')
+      div(class="input-group")
+        label(for="price") Price ($)
+        input(id="price" name="price" type="number" required placeholder="Ex: 24" value=item ? item.price : '')
+    div(class="input-group")
+      label(for="description") Description
+      textarea(id="description" name="description" required placeholder="Add description here") #{item ? item.description : ''}
+    div(class="input-group")
+      label(for="img") Imagine (300x300 recommended)
+      input(id="img" type="file", name="img")
+    button(class="submit-btn" type="submit") Submit
