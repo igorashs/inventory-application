@@ -210,11 +210,26 @@ exports.getCategoryDelete = async (req, res, next) => {
 exports.postCategoryDelete = async (req, res, next) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
-    const items = await Item.deleteMany({ category: req.params.id });
-    const file = await mf.findFileAndRemoveWithExt(
+
+    // remove category image
+    await mf.findFileAndRemoveWithExt(
       path.join(__dirname, '../public/assets/images/', req.params.id),
       ['.png', '.jpg']
     );
+
+    const itemsID = await Item.find({ category: req.params.id }, '.id');
+
+    // remove also all items images
+    await Promise.all(
+      itemsID.map((item) =>
+        mf.findFileAndRemoveWithExt(
+          path.join(__dirname, '../public/assets/images/', item._id.toString()),
+          ['.png', '.jpg']
+        )
+      )
+    );
+
+    await Item.deleteMany({ category: req.params.id });
 
     res.redirect('/catalog/categories');
   } catch (err) {
