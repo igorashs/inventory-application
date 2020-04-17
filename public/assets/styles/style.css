@@ -330,6 +330,7 @@ input[type='file']::-webkit-file-upload-button,
 .deletion-options {
   margin-top: 16px;
   display: grid;
+  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
