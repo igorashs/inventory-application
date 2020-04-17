@@ -88,8 +88,19 @@ exports.postItemCreate = async (req, res, next) => {
 };
 
 // display item update form on GET
-exports.getItemUpdate = (req, res) => {
-  res.send('/item/:id/update GET not implemented');
+exports.getItemUpdate = async (req, res, next) => {
+  try {
+    const item = await Item.findById(req.params.id).populate('category');
+
+    res.render('item-form', {
+      title: `Create ${item.category.name} item`,
+      item,
+      category: item.category
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // handle item update on POST
