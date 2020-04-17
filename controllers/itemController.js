@@ -157,8 +157,18 @@ exports.postItemUpdate = async (req, res, next) => {
 };
 
 // display item delete form on GET
-exports.getItemDelete = (req, res) => {
-  res.send('/item/:id/delete GET not implemented');
+exports.getItemDelete = async (req, res, next) => {
+  try {
+    const item = await Item.findById(req.params.id).populate('category');
+
+    res.render('item-delete', {
+      title: `Remove ${item.name} item from ${item.category.name} category`,
+      item
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // handle item delete on POST
