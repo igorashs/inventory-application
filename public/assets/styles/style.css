@@ -330,12 +330,17 @@ input[type='file']::-webkit-file-upload-button,
 .deletion-options {
   margin-top: 16px;
   display: grid;
-  grid-template-columns: 1fr 1fr;
   gap: 10px;
 }
 
 .deletion-options > .submit-btn {
   margin-top: 0;
+}
+
+.quantity {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
 }
 
 /* footer */
