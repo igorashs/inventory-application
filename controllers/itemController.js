@@ -93,7 +93,7 @@ exports.getItemUpdate = async (req, res, next) => {
     const item = await Item.findById(req.params.id).populate('category');
 
     res.render('item-form', {
-      title: `Create ${item.category.name} item`,
+      title: `Update ${item.category.name} item`,
       item,
       category: item.category
     });
@@ -104,8 +104,56 @@ exports.getItemUpdate = async (req, res, next) => {
 };
 
 // handle item update on POST
-exports.postItemUpdate = (req, res) => {
-  res.send('/item/:id/update POST not implemented');
+exports.postItemUpdate = async (req, res, next) => {
+  mf.upload(req, res, async (err) => {
+    try {
+      let errors = findAllValidationErrors(err, req.body, itemValidationSchema);
+
+      const item = await Item.findById(req.params.id).populate('category');
+
+      if (errors.length) {
+        debug(errors);
+        res.render('item-form', {
+          title: `Update ${item.category.name} item`,
+          category: item.category,
+          errors,
+          item: req.body
+        });
+      } else {
+        const results = {};
+
+        results.item = item.updateOne(req.body);
+
+        if (req.file) {
+          const ext = path.extname(req.file.originalname);
+          const filename = `${req.params.id}${ext}`;
+
+          results.unlinkFile = mf.unlinkWithAnotherExt(
+            path.join(__dirname, '../public/assets/images/'),
+            req.params.id,
+            ext,
+            ['.png', '.jpg']
+          );
+
+          // save the file if id name of document
+          results.fileSave = mf.writeFile(
+            path.join(__dirname, '../public/assets/images/', filename),
+            req.file.buffer
+          );
+
+          await results.unlinkFile;
+          await results.fileSave;
+        }
+
+        await results.item;
+
+        res.redirect(`/catalog/category/${item.category._id}`);
+      }
+    } catch (err) {
+      debug(err);
+      next();
+    }
+  });
 };
 
 // display item delete form on GET
