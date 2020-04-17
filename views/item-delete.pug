@@ -1,0 +1,16 @@
+extend layout
+
+block navigation_links
+    li
+      a(href="/catalog/item/"+item._id) Back
+
+block content
+  header
+    h1= title
+  
+  form(class="form" action="", method="post")
+    h2 This item will be removed
+    p Do you want to remove this item?
+    div(class="deletion-options")
+      button(class="submit-btn btn-delete" type="submit") Yes
+      a(class="reject-btn" href="/catalog/item/"+item._id) No
