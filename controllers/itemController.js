@@ -1,4 +1,5 @@
 const Item = require('../models/item');
+const Category = require('../models/category');
 const debug = require('debug')('controller');
 
 // display details for a specific item on GET
@@ -14,8 +15,18 @@ exports.getItemDetail = async (req, res, next) => {
 };
 
 // display item create form on GET
-exports.getItemCreate = (req, res) => {
-  res.send('/item/create GET not implemented');
+exports.getItemCreate = async (req, res, next) => {
+  try {
+    const category = await Category.findById(req.params.id);
+
+    res.render('item-form', {
+      title: `Create ${category.name} item`,
+      category
+    });
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
 
 // handle item create on POST
