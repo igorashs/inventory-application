@@ -172,6 +172,23 @@ exports.getItemDelete = async (req, res, next) => {
 };
 
 // handle item delete on POST
-exports.postItemDelete = (req, res) => {
-  res.send('/item/:id/delete POST not implemented');
+exports.postItemDelete = async (req, res, next) => {
+  try {
+    const item = await Item.findById(req.params.id);
+
+    // remove item image
+    await mf.findFileAndRemoveWithExt(
+      path.join(__dirname, '../public/assets/images/', req.params.id),
+      ['.png', '.jpg']
+    );
+
+    const categoryID = item.category;
+
+    await Item.findByIdAndDelete(req.params.id);
+
+    res.redirect(`/catalog/category/${categoryID}`);
+  } catch (err) {
+    debug(err);
+    next();
+  }
 };
