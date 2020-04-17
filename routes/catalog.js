@@ -34,10 +34,10 @@ router.get('/categories', categoryController.getCategoryList);
 // item
 
 // GET req for creating an item
-router.get('/item/create', itemController.getItemCreate);
+router.get('/item/:id/create', itemController.getItemCreate);
 
 // POST req for creating an item
-router.post('/item/create', itemController.postItemCreate);
+router.post('/item/:id/create', itemController.postItemCreate);
 
 // GET req to delete an item
 router.get('/item/:id/delete', itemController.getItemDelete);
