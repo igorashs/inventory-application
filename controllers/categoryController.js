@@ -2,88 +2,9 @@ const Category = require('../models/category');
 const Item = require('../models/item');
 const debug = require('debug')('controller');
 const Joi = require('@hapi/joi');
-const util = require('util');
-const fs = require('fs');
 const path = require('path');
-const multer = require('multer');
-
-const writeFile = util.promisify(fs.writeFile);
-const unlink = util.promisify(fs.unlink);
-
-// MB
-const FILE_SIZE = 2;
-const MAX_FILE_SIZE = 1024 * 1024 * FILE_SIZE;
-
-function unlinkWithAnotherExt(dir, filename, ext, otherExts) {
-  const others = otherExts.filter((other) => other !== ext);
-
-  return Promise.all(
-    others.map((other) => {
-      const otherFile = path.join(dir, `${filename}${other}`);
-
-      if (fs.existsSync(otherFile)) {
-        return unlink(otherFile);
-      }
-    })
-  );
-}
-
-function checkForFileErr(err) {
-  if (err) {
-    if (err.code === 'LIMIT_FILE_SIZE') {
-      return {
-        message: `"image" the file size should be less than ${FILE_SIZE} MB`
-      };
-    }
-
-    if (err.code === 'MISMATCH_MIME_TYPE') {
-      return { message: err.message };
-    }
-  }
-}
-
-function findFileAndRemoveWithExt(filename, exts) {
-  exts.forEach((ext) => {
-    const file = `${filename}${ext}`;
-
-    if (fs.existsSync(file)) {
-      return unlink(file);
-    }
-  });
-}
-
-function findAllValidationErrors(fileErr, body) {
-  let errors = [];
-
-  const foundFileErr = checkForFileErr(fileErr);
-
-  if (foundFileErr) {
-    errors.push(foundFileErr);
-  }
-
-  const { error } = categoryValidationSchema.validate(body, {
-    abortEarly: false
-  });
-
-  if (error) {
-    errors = errors.concat(error.details);
-  }
-
-  return errors;
-}
-
-const upload = multer({
-  limits: { fileSize: MAX_FILE_SIZE },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
-      cb(null, true);
-    } else {
-      const err = new Error('"image" make sure is a jpg or png file');
-      err.code = 'MISMATCH_MIME_TYPE';
-      cb(err);
-    }
-  }
-}).single('img');
+const mf = require('../lib/fileManager');
+const { findAllValidationErrors } = require('../lib/validationErrorManager');
 
 const categoryValidationSchema = Joi.object({
   name: Joi.string().trim().min(1).max(100).required(),
@@ -150,8 +71,12 @@ exports.getCategoryCreate = (req, res) => {
 
 // handle category create on POST
 exports.postCategoryCreate = async (req, res, next) => {
-  upload(req, res, async (err) => {
-    let errors = findAllValidationErrors(err, req.body);
+  mf.upload(req, res, async (err) => {
+    let errors = findAllValidationErrors(
+      err,
+      req.body,
+      categoryValidationSchema
+    );
 
     if (errors.length) {
       debug(errors);
@@ -175,7 +100,7 @@ exports.postCategoryCreate = async (req, res, next) => {
           )}`;
 
           // save the file if id name of document
-          results.fileSave = writeFile(
+          results.fileSave = mf.writeFile(
             path.join(__dirname, '../public/assets/images/', filename),
             req.file.buffer
           );
@@ -211,8 +136,12 @@ exports.getCategoryUpdate = async (req, res, next) => {
 
 // handle category update on POST
 exports.postCategoryUpdate = async (req, res, next) => {
-  upload(req, res, async (err) => {
-    let errors = findAllValidationErrors(err, req.body);
+  mf.upload(req, res, async (err) => {
+    let errors = findAllValidationErrors(
+      err,
+      req.body,
+      categoryValidationSchema
+    );
 
     if (errors.length) {
       debug(errors);
@@ -231,7 +160,7 @@ exports.postCategoryUpdate = async (req, res, next) => {
           const ext = path.extname(req.file.originalname);
           const filename = `${req.params.id}${ext}`;
 
-          results.unlinkFile = unlinkWithAnotherExt(
+          results.unlinkFile = mf.unlinkWithAnotherExt(
             path.join(__dirname, '../public/assets/images/'),
             req.params.id,
             ext,
@@ -239,7 +168,7 @@ exports.postCategoryUpdate = async (req, res, next) => {
           );
 
           // save the file if id name of document
-          results.fileSave = writeFile(
+          results.fileSave = mf.writeFile(
             path.join(__dirname, '../public/assets/images/', filename),
             req.file.buffer
           );
@@ -282,7 +211,7 @@ exports.postCategoryDelete = async (req, res, next) => {
   try {
     const category = await Category.findByIdAndDelete(req.params.id);
     const items = await Item.deleteMany({ category: req.params.id });
-    const file = await findFileAndRemoveWithExt(
+    const file = await mf.findFileAndRemoveWithExt(
       path.join(__dirname, '../public/assets/images/', req.params.id),
       ['.png', '.jpg']
     );
