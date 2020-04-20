@@ -12,12 +12,12 @@ block content
     ul(class="error-list")
       li= error.message
 
-  form(class="form" action="", method="post")
+  form(class="form" action="", method="post" autocomplete="off")
     h2 This category and its data (#{itemCount} item#{itemCount > 1 ? 's' : ''}) will be removed
     p Do you want to remove this category?
     div(class="input-group")
       label(for="password") Password
-      input(id="password" name="password" type="password" required)
+      input(id="password" name="password" type="password" required title="TRY: 'ilovetop'")
     div(class="deletion-options")
       button(class="submit-btn btn-delete" type="submit") Yes
       a(class="reject-btn" href="/catalog/categories") No
