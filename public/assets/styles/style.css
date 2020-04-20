@@ -339,6 +339,11 @@ input[type='file']::-webkit-file-upload-button,
   margin-top: 0;
 }
 
+.deletion-options > .reject-btn {
+  justify-self: end;
+  width: 100%;
+}
+
 .quantity {
   display: flex;
   justify-content: space-between;
