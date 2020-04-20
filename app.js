@@ -4,6 +4,8 @@ const debugServer = require('debug')('inventory-application:server');
 const path = require('path');
 const mongoose = require('mongoose');
 const env = require('./.env.config');
+const compression = require('compression');
+const helmet = require('helmet');
 
 const app = express();
 
@@ -22,6 +24,16 @@ const catalogRouter = require('./routes/catalog');
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+// put the helmet on!
+app.use(
+  helmet({
+    hidePoweredBy: { setTo: 'Hidden wizard' }
+  })
+);
+
+// add compression
+app.use(compression());
 
 // serve static files
 app.use(express.static(path.join(__dirname, 'public')));
