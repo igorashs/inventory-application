@@ -5,13 +5,27 @@ const debug = require('debug')('controller');
 const path = require('path');
 const mf = require('../lib/fileManager');
 const { findAllValidationErrors } = require('../lib/validationErrorManager');
+const { PASSWORD } = require('../.env.config');
 
-const itemValidationSchema = Joi.object({
+const itemValidation = {
   name: Joi.string().trim().min(1).max(100).required(),
   description: Joi.string().trim().min(1).max(255).required(),
   price: Joi.number().min(0).required(),
   stock: Joi.number().min(0).required(),
   img: Joi.string().trim().allow('')
+};
+
+const passwordValidation = {
+  password: Joi.string().equal(PASSWORD).required().messages({
+    'any.only': 'Incorrect Password!'
+  })
+};
+
+const passwordValidationSchema = Joi.object(passwordValidation);
+const itemCreateValidationSchema = Joi.object(itemValidation);
+const itemUpdateValidationSchema = Joi.object({
+  ...itemValidation,
+  ...passwordValidation
 });
 
 // display details for a specific item on GET
@@ -45,7 +59,11 @@ exports.getItemCreate = async (req, res, next) => {
 exports.postItemCreate = async (req, res, next) => {
   mf.upload(req, res, async (err) => {
     try {
-      let errors = findAllValidationErrors(err, req.body, itemValidationSchema);
+      let errors = findAllValidationErrors(
+        err,
+        req.body,
+        itemCreateValidationSchema
+      );
 
       const category = await Category.findById(req.params.id);
 
@@ -95,7 +113,8 @@ exports.getItemUpdate = async (req, res, next) => {
     res.render('item-form', {
       title: `Update ${item.category.name} item`,
       item,
-      category: item.category
+      category: item.category,
+      isPasswordRequired: true
     });
   } catch (err) {
     debug(err);
@@ -107,7 +126,11 @@ exports.getItemUpdate = async (req, res, next) => {
 exports.postItemUpdate = async (req, res, next) => {
   mf.upload(req, res, async (err) => {
     try {
-      let errors = findAllValidationErrors(err, req.body, itemValidationSchema);
+      let errors = findAllValidationErrors(
+        err,
+        req.body,
+        itemUpdateValidationSchema
+      );
 
       const item = await Item.findById(req.params.id).populate('category');
 
@@ -117,7 +140,8 @@ exports.postItemUpdate = async (req, res, next) => {
           title: `Update ${item.category.name} item`,
           category: item.category,
           errors,
-          item: req.body
+          item: req.body,
+          isPasswordRequired: true
         });
       } else {
         const results = {};
@@ -174,19 +198,31 @@ exports.getItemDelete = async (req, res, next) => {
 // handle item delete on POST
 exports.postItemDelete = async (req, res, next) => {
   try {
-    const item = await Item.findById(req.params.id);
+    const { error } = passwordValidationSchema.validate(req.body);
 
-    // remove item image
-    await mf.findFileAndRemoveWithExt(
-      path.join(__dirname, '../public/assets/images/', req.params.id),
-      ['.png', '.jpg']
-    );
+    if (error) {
+      const item = await Item.findById(req.params.id).populate('category');
 
-    const categoryID = item.category;
+      res.render('item-delete', {
+        title: `Remove ${item.name} item from ${item.category.name} category`,
+        item,
+        error
+      });
+    } else {
+      const item = await Item.findById(req.params.id);
 
-    await Item.findByIdAndDelete(req.params.id);
+      // remove item image
+      await mf.findFileAndRemoveWithExt(
+        path.join(__dirname, '../public/assets/images/', req.params.id),
+        ['.png', '.jpg']
+      );
 
-    res.redirect(`/catalog/category/${categoryID}`);
+      const categoryID = item.category;
+
+      await Item.findByIdAndDelete(req.params.id);
+
+      res.redirect(`/catalog/category/${categoryID}`);
+    }
   } catch (err) {
     debug(err);
     next();

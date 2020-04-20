@@ -33,4 +33,8 @@ block content
     div(class="input-group")
       label(for="img") Imagine (300x300 recommended)
       input(id="img" type="file", name="img")
+    if isPasswordRequired
+      div(class="input-group")
+        label(for="password") Password
+        input(id="password" name="password" type="password" required)
     button(class="submit-btn" type="submit") Submit

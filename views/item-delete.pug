@@ -7,10 +7,17 @@ block navigation_links
 block content
   header
     h1= title
+
+  if error
+    ul(class="error-list")
+      li= error.message
   
   form(class="form" action="", method="post")
     h2 This item will be removed
     p Do you want to remove this item?
+    div(class="input-group")
+      label(for="password") Password
+      input(id="password" name="password" type="password" required)
     div(class="deletion-options")
       button(class="submit-btn btn-delete" type="submit") Yes
       a(class="reject-btn" href="/catalog/item/"+item._id) No
