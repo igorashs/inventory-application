@@ -1,6 +1,9 @@
 const router = require('express').Router();
 const categoryController = require('../controllers/categoryController');
 const itemController = require('../controllers/itemController');
+const express = require('express');
+
+router.use(express.urlencoded({ extended: false }));
 
 // category
 
