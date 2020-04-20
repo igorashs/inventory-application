@@ -5,11 +5,25 @@ const Joi = require('@hapi/joi');
 const path = require('path');
 const mf = require('../lib/fileManager');
 const { findAllValidationErrors } = require('../lib/validationErrorManager');
+const { PASSWORD } = require('../.env.config');
 
-const categoryValidationSchema = Joi.object({
+const categoryValidation = {
   name: Joi.string().trim().min(1).max(100).required(),
   description: Joi.string().trim().min(1).max(255).required(),
   img: Joi.string().trim().allow('')
+};
+
+const passwordValidation = {
+  password: Joi.string().equal(PASSWORD).required().messages({
+    'any.only': 'Incorrect Password!'
+  })
+};
+
+const categoryCreateValidationSchema = Joi.object(categoryValidation);
+const passwordValidationSchema = Joi.object(passwordValidation);
+const categoryUpdateValidationSchema = Joi.object({
+  ...categoryValidation,
+  ...passwordValidation
 });
 
 // home page (shows total data) on GET
@@ -75,7 +89,7 @@ exports.postCategoryCreate = async (req, res, next) => {
     let errors = findAllValidationErrors(
       err,
       req.body,
-      categoryValidationSchema
+      categoryCreateValidationSchema
     );
 
     if (errors.length) {
@@ -126,7 +140,8 @@ exports.getCategoryUpdate = async (req, res, next) => {
 
     res.render('category-form', {
       title: `Update ${category.name} category`,
-      category
+      category,
+      isPasswordRequired: true
     });
   } catch (err) {
     debug(err);
@@ -140,7 +155,7 @@ exports.postCategoryUpdate = async (req, res, next) => {
     let errors = findAllValidationErrors(
       err,
       req.body,
-      categoryValidationSchema
+      categoryUpdateValidationSchema
     );
 
     if (errors.length) {
@@ -148,7 +163,8 @@ exports.postCategoryUpdate = async (req, res, next) => {
       res.render('category-form', {
         title: `Update ${req.body.name} category`,
         errors,
-        category: req.body
+        category: req.body,
+        isPasswordRequired: true
       });
     } else {
       try {
@@ -209,29 +225,50 @@ exports.getCategoryDelete = async (req, res, next) => {
 // handle category delete on POST
 exports.postCategoryDelete = async (req, res, next) => {
   try {
-    const category = await Category.findByIdAndDelete(req.params.id);
+    const { error } = passwordValidationSchema.validate(req.body);
 
-    // remove category image
-    await mf.findFileAndRemoveWithExt(
-      path.join(__dirname, '../public/assets/images/', req.params.id),
-      ['.png', '.jpg']
-    );
+    if (error) {
+      const results = {};
 
-    const itemsID = await Item.find({ category: req.params.id }, '.id');
+      results.category = await Category.findById(req.params.id);
+      results.itemCount = await Item.countDocuments({
+        category: req.params.id
+      });
 
-    // remove also all items images
-    await Promise.all(
-      itemsID.map((item) =>
-        mf.findFileAndRemoveWithExt(
-          path.join(__dirname, '../public/assets/images/', item._id.toString()),
-          ['.png', '.jpg']
+      res.render('category-delete', {
+        title: `Remove ${results.category.name} category`,
+        ...results,
+        error
+      });
+    } else {
+      const category = await Category.findByIdAndDelete(req.params.id);
+
+      // remove category image
+      await mf.findFileAndRemoveWithExt(
+        path.join(__dirname, '../public/assets/images/', req.params.id),
+        ['.png', '.jpg']
+      );
+
+      const itemsID = await Item.find({ category: req.params.id }, '.id');
+
+      // remove also all items images
+      await Promise.all(
+        itemsID.map((item) =>
+          mf.findFileAndRemoveWithExt(
+            path.join(
+              __dirname,
+              '../public/assets/images/',
+              item._id.toString()
+            ),
+            ['.png', '.jpg']
+          )
         )
-      )
-    );
+      );
 
-    await Item.deleteMany({ category: req.params.id });
+      await Item.deleteMany({ category: req.params.id });
 
-    res.redirect('/catalog/categories');
+      res.redirect('/catalog/categories');
+    }
   } catch (err) {
     debug(err);
     next();
