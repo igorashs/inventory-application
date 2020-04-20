@@ -12,7 +12,7 @@ block content
     div(class="options")
       a(class="btn btn-update" href='/catalog/category/' + category._id + '/update') Update
       a(class="btn btn-delete" href='/catalog/category/' + category._id + '/delete') Delete
-    p= category.description
+    p(class="description")= category.description
 
 
   ul(class="list list-items")
