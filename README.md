@@ -2,6 +2,7 @@
 
 > ## From The Odin Project's [curriculum](https://www.theodinproject.com/lessons/inventory-application)
 
+### The password is intended to be in the HTML
 > - [Live Demo](https://nameless-harbor-47929.herokuapp.com/catalog) :shipit:
 
 ## Assignment
